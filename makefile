@@ -3,4 +3,4 @@
 all: run
 
 run:
-	python3 sock.py PORT=${PORT}
+	python3 src/sock.py PORT=${PORT}
