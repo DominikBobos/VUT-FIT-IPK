@@ -1,8 +1,13 @@
-import socket
-import sys
-from urllib.parse import urlparse
+import socket 	  		            #for all the server work 
+import sys							#for input arguments
+from urllib.parse import urlparse	#for validating url
 
-
+##
+#	Projekt pre predmet IPK
+#	akad. rok: 2019/2020
+#	autor: Boboš Dominik (xbobos00)
+##
+s
 def ValidIp(address):	#checks for valid IP
     try: 
         socket.inet_aton(address)
@@ -25,7 +30,7 @@ def ValidAddress(address):	#checks for valid IP or URL
 
 #arguments parsing
 if (len(sys.argv) == 2) and (sys.argv[1][4] == '='):
-	str1 = sys.argv[1].split('=')[0] #if (sys.argv[2] == "3333"):
+	str1 = sys.argv[1].split('=')[0]
 	str2 = sys.argv[1].split('=')[1]
 	if (str1 == 'PORT' and str2.isdigit() ):
 		pass
@@ -54,13 +59,14 @@ while (True):
 	http = data[http:http_end].decode('utf-8')
 	error_str = http + ' 400 Bad Request\r\n\r\n'
 
+	#providing GET request
 	if (data[:3] == b'GET'):
 		if (data[4:12] != b'/resolve'):
 			conn.send(error_str.encode('utf-8'))
 			conn.close()
 			continue
 		try:
-			data = data.split(b'?')		#GET a resolve v [0] zvysok v [1]
+			data = data.split(b'?')		#GET a resolve v [0] others in [1]
 		except ValueError:
 			conn.send(error_str.encode('utf-8'))
 			conn.close()
@@ -68,12 +74,12 @@ while (True):
 
 		if (len(data) == 2):
 			try:
-				url = data[1].split(b'&')	#url pripadne ip mam v [0] zvysok v [1]
+				url = data[1].split(b'&')	#url/ip is in [0] others in [1]
 			except ValueError:
 				conn.send(error_str.encode('utf-8'))
 				conn.close()
 				continue
-		else:		# data sa nespravne rozdelili
+		else:		# bad splitted data
 			conn.send(error_str.encode('utf-8'))
 			conn.close()
 			continue
@@ -97,7 +103,7 @@ while (True):
 			conn.send(http_ver.encode('utf-8'))
 			conn.send(send_str.encode('utf-8'))
 			conn.close()	
-		elif (len(url) == 2 and url[1][5:8] == bytes("PTR",'utf-8')):
+		elif (len(url) == 2 and url[1][5:8] == bytes("PTR",'utf-8')):	#type "PTR"
 			
 			if (ValidIp(url[0][5:].decode('utf-8')) == False):
 				url = urlparse(url[0][5:].decode('utf-8'))
@@ -136,7 +142,7 @@ while (True):
 			conn.close()
 			continue
 
-
+	#providing POST request
 	elif (data[:4] == b'POST'):
 		if (data[5:15] != b'/dns-query'):
 			conn.send(error_str.encode('utf-8'))
@@ -152,7 +158,13 @@ while (True):
 
 		send_str = ''
 		final_msg = ''
-		for x in range(7,len(data)):
+		if(data[7] == ''):				#empty post
+			http_ver = http + " 200 OK\r\n\r\n"
+			conn.send(http_ver.encode('utf-8'))
+			conn.close()
+			continue
+
+		for x in range(7,len(data)):	#from index 7 to the rest are URLs/IPs
 			if (data[x][-2] == 'A' or data[x][-1] == 'A'):
 				ind = 0
 				if (data[x][-1] == 'A'):
@@ -192,6 +204,7 @@ while (True):
 		conn.send(http_ver.encode('utf-8'))
 		conn.send(final_msg.encode('utf-8'))
 		conn.close()
+	# neither of allowed requests
 	else:
 		error_str = http + ' 405 Method Not Allowed\r\n\r\n'
 		conn.send(error_str.encode('utf-8'))
