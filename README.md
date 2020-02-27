@@ -3,11 +3,11 @@
 ## HTTP resolver doménových mien
 
 Projekt implementovaný v jazyku **_Python3_**.
-Použité knižnice sú:⋅⋅
-_socket_ na vytvorenie serveru, komunikáciu s klientom a overovanie IP adries⋅⋅
-_sys_ pre správu triviálnych funkcií ako sys.exit alebo spracovanie argumentu⋅⋅
-_urllib_ konkrétne urlparse - na validáciu url adries.⋅⋅
-⋅⋅
+Použité knižnice sú:<br/>
+_socket_ na vytvorenie serveru, komunikáciu s klientom a overovanie IP adries<br/>
+_sys_ pre správu triviálnych funkcií ako sys.exit alebo spracovanie argumentu<br/>
+_urllib_ konkrétne urlparse - na validáciu url adries.<br/>
+<br/>
 Server podporuje povinné **GET** a **POST** requesty.⋅⋅
 Program sa spúšta pomocou _Makefile_ príkazom:⋅⋅
 **_$ make run PORT='číslo portu'_** 
