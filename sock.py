@@ -7,7 +7,7 @@ from urllib.parse import urlparse	#for validating url
 #	akad. rok: 2019/2020
 #	autor: Boboš Dominik (xbobos00)
 ##
-s
+
 def ValidIp(address):	#checks for valid IP
     try: 
         socket.inet_aton(address)
