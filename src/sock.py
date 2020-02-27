@@ -53,6 +53,7 @@ s.bind((TCP_IP, TCP_PORT))
 while (True):
 	s.listen(1)	#waits for connection
 	conn, addr = s.accept()
+	print ("Connection from:" , conn)
 	data = conn.recv(BUFFER_SIZE)	#recieving data
 	http = data.find(b'HTTP')	#checks for http version
 	http_end = data.find(b"\r",http)
