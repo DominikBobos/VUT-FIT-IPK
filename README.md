@@ -4,15 +4,16 @@
 
 Projekt implementovaný v jazyku **_Python3_**.
 Použité knižnice sú:<br/>
-_socket_ na vytvorenie serveru, komunikáciu s klientom a overovanie IP adries<br/>
+_socket_ na vytvorenie serveru, komunikáciu s klientom a overovanie IP adries _(IPv4, IPv6)_ <br/>
 _sys_ pre správu triviálnych funkcií ako sys.exit alebo spracovanie argumentu<br/>
 _urllib_ konkrétne urlparse - na validáciu url adries.<br/>
 <br/>
-Server po spustení na localhost a zadanom porte beží v nekonečnom cykle pričom čaká na pripojenie klienta, po pripojení vypíše na stdout bližšie informácie o klientovi a začne spĺňať požiadavky klienta, v prípade chýb v požiadavku alebo iných nepriaznivých situacií server posiela klientovi návratový kód  _400 Bad Request, 404 Not Found, 405 Method Not Allowed_ a v prípade úspechu pošle žiadanú odpoveď s návratovou hodnotu _200 OK_.<br/>
+Server po spustení na localhost a zadanom porte beží v nekonečnom cykle pričom čaká na pripojenie klienta, po pripojení vypíše na stdout bližšie informácie o klientovi a začne spĺňať požiadavky klienta, v prípade chýb v požiadavku alebo iných nepriaznivých situacií server posiela klientovi návratový kód  _400 Bad Request, 404 Not Found, 405 Method Not Allowed_ a v prípade úspechu pošle žiadanú odpoveď s návratovou hodnotou _200 OK_.<br/>
 <br/>
 Server podporuje povinné **GET** a **POST** requesty.<br/>
 Program sa spúšta pomocou _Makefile_ príkazom:<br/>
 **_$ make run PORT='číslo portu'_**<br/>
+Pre ukončenie je nutné zastaviť server kombináciou _CONTROL + C_ <br/>
 <br/>
 K testovaniu poslúži program _Curl_  <br/>
 pre GET: **_$ curl localhost:5353/resolve?name=www.fit.vutbr.cz\&type=A_** <br/>

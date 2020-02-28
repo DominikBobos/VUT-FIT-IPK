@@ -36,13 +36,13 @@ def ValidAddress(address):	#checks for valid IP or URL
 if (len(sys.argv) == 2) and (sys.argv[1][4] == '='):
 	str1 = sys.argv[1].split('=')[0]
 	str2 = sys.argv[1].split('=')[1]
-	if (str1 == 'PORT' and str2.isdigit() ):
+	if (str1 == 'PORT' and str2.isdigit() and (int(str2) >= 1024 and int(str2) <= 65535)):
 		pass
 	else:
-		sys.stderr.write("ERROR: Wrong typed port.\n")
+		sys.stderr.write("ERROR: Wrong typed port. Port is a number from 1024 to 65535 \n")
 		sys.exit(1)
 else:
-	sys.stderr.write("ERROR: Could not start server, TCP_PORT was not specified.\n")
+	sys.stderr.write("ERROR: Could not start server, TCP_PORT was not specified. Port is a number from 1024 to 65535 \n")
 	sys.exit(1)
 
 
@@ -171,7 +171,7 @@ while (True):
 
 		for x in range(7,len(data)):	#from index 7 to the rest are URLs/IPs
 			if (data[x][-2] == 'A' or data[x][-1] == 'A'):
-				ind = 0
+				ind = 0			#ind is var for protecting different EOF endings  
 				if (data[x][-1] == 'A'):
 					ind = 1
 				url = ValidAddress(data[x][:(-3+ind)])
@@ -186,7 +186,7 @@ while (True):
 				send_str = url + ":A=" + ip[2][0] + "\n"
 
 			elif (data[x][-4:-1] == 'PTR' or data[x][-3:] == 'PTR'):
-				ind = 0
+				ind = 0			
 				if (data[x][-3:] == 'PTR'):
 					ind = 1
 				url = ValidAddress(data[x][:(-5+ind)])
