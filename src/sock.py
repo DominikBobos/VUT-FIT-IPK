@@ -9,11 +9,15 @@ from urllib.parse import urlparse	#for validating url
 ##
 
 def ValidIp(address):	#checks for valid IP
-    try: 
-        socket.inet_aton(address)
-        return True
-    except:
-        return False
+	try: 
+		socket.inet_pton(socket.AF_INET6, address)
+		return True
+	except:
+		try: 
+			socket.inet_aton(address)
+			return True
+		except:
+			return False
 
 def ValidAddress(address):	#checks for valid IP or URL
 	if (isinstance(address, str)):
@@ -92,14 +96,14 @@ while (True):
 				conn.close()
 				continue
 			try:
-				ip = socket.gethostbyname(url)
+				ip = socket.gethostbyaddr(url)
 			except:
 				error_str = http + ' 404 Not Found\r\n\r\n'
 				conn.send(error_str.encode('utf-8'))
 				conn.close()
 				continue
 			http_ver = http + " 200 OK\r\n\r\n"
-			send_str = url + ":A=" + ip + "\n"
+			send_str = url + ":A=" + ip[2][0] + "\n"
 			
 			conn.send(http_ver.encode('utf-8'))
 			conn.send(send_str.encode('utf-8'))
@@ -176,10 +180,10 @@ while (True):
 					conn.close()
 					break
 				try:
-					ip = socket.gethostbyname(url)
+					ip = socket.gethostbyaddr(url)
 				except:
 					continue	#not included to final response
-				send_str = url + ":A=" + ip + "\n"
+				send_str = url + ":A=" + ip[2][0] + "\n"
 
 			elif (data[x][-4:-1] == 'PTR' or data[x][-3:] == 'PTR'):
 				ind = 0
