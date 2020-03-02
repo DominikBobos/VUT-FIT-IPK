@@ -204,7 +204,7 @@ while (True):
 			conn.send(error_str.encode('utf-8'))
 			conn.close()
 			continue
-
+		err_req = 0
 		err_check = 0;
 		colon_ind = 0
 		req_type = ''
@@ -215,9 +215,9 @@ while (True):
 			if (req_type == 'A'):
 				url = ValidURL(data[x][:colon_ind])
 				if (url == False):
-					err_check = len(data)	#just to specify error message
+					err_req += 1	#just to specify error message
 					print("IP entered, but hostname was expected")
-					break
+					continue
 				try:
 					ip = socket.gethostbyaddr(url)
 				except:
@@ -228,9 +228,9 @@ while (True):
 			elif (req_type == 'PTR'):
 				url = ValidIp(data[x][:colon_ind])
 				if (url == False):
-					err_check = len(data)	#just to specify error message
+					err_req += 1	#just to specify error message
 					print("Hostname entered, but IP was expected")
-					break
+					continue
 				try:
 					host = socket.gethostbyaddr(url)
 				except:
@@ -238,15 +238,15 @@ while (True):
 					continue	#not included to final response
 				send_str = url + ":PTR=" + host[0] + "\n"			
 			elif (colon_ind == 0 and req_type == ''):
-				err_check +=1
+				err_req +=1
 				continue	
 			else:
-				err_check = len(data)	#just to specify error message
+				err_req += 1	#just to specify error message
 				break
 			final_msg += send_str
 
-		if (err_check == len(data)-7 or err_check == len(data)):
-			if (err_check == len(data)):		#bad request
+		if (err_check == len(data)-7 or (err_req + err_check == len(data)-7)):
+			if (err_req == len(data)-7):		#bad request
 				conn.send(error_str.encode('utf-8'))
 				conn.close()
 			else:
