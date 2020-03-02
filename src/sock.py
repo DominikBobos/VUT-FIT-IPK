@@ -9,15 +9,26 @@ from urllib.parse import urlparse	#for validating url
 ##
 
 def ValidIp(address):	#checks for valid IP
+	if (isinstance(address, bytes)):
+		address = address.decode('utf-8')
 	try: 
-		socket.inet_pton(socket.AF_INET6, address)
-		return True
+		socket.inet_aton(address)
+		return address
 	except:
 		try: 
-			socket.inet_aton(address)
-			return True
+			socket.inet_pton(socket.AF_INET6, address)
+			return address
 		except:
 			return False
+
+def ValidURL(address):	#checks for valid URL
+	if (isinstance(address, str)):
+		address = address.encode('utf-8')
+	url = urlparse(address.decode('utf-8'))
+	url = url[2]			
+	if (url == '' or url == ValidIp(url)):	#case when 'A' but IP was entered
+		return False			#end connection
+	return url 					#return url
 
 def ValidAddress(address):	#checks for valid IP or URL
 	if (isinstance(address, str)):
@@ -25,12 +36,33 @@ def ValidAddress(address):	#checks for valid IP or URL
 	if (ValidIp(address.decode('utf-8')) == False):
 		url = urlparse(address.decode('utf-8'))
 		url = url[2]			
-		return url 					#return url
 		if (url == ''):
 			return False			#end connection
+		return url 					#return url
 	else:
 		url = address.decode('utf-8')	
 		return url 					#return IP
+
+#for parsing and finding A or PTR type 
+def AorPTR(data, bool_str):
+	if (bool_str == False):
+		if (isinstance(data, bytes)):
+			print(data)
+			data = data.decode('utf-8')
+	if (data.rfind('type') != -1):	#I have GET
+		if (data.find('A', 0, data.find('HTTP')) != -1):
+			return data.rfind('type'), "A"
+		elif (data.find('PTR',0, data.find('HTTP')) != -1):
+			return data.rfind('type'), "PTR"
+	elif (data.rfind(':') != -1):	#I have POST
+		if (data.find('A',data.rfind(':')) != -1):
+			return data.rfind(':'), "A"
+		elif (data.find('PTR',data.rfind(':')) != -1):
+			return data.rfind(':'), "PTR"
+	else:
+		return False, False
+
+
 
 #arguments parsing
 if (len(sys.argv) == 2) and (sys.argv[1][4] == '='):
@@ -89,9 +121,15 @@ while (True):
 			conn.close()
 			continue
 
-		if (len(url) == 2 and url[1][5] == 65):	#type "A"
-			url = ValidAddress(url[0][5:])
+		colon_ind = 0
+		req_type = ''
+		if (len(url) == 2):
+			colon_ind, req_type = AorPTR(url[1], False)
+
+		if (len(url) == 2 and req_type == 'A'):	#type "A"
+			url = ValidURL(url[0][5:])
 			if (url == False):
+				print("IP entered, but hostname was expected")
 				conn.send(error_str.encode('utf-8'))
 				conn.close()
 				continue
@@ -108,19 +146,10 @@ while (True):
 			conn.send(http_ver.encode('utf-8'))
 			conn.send(send_str.encode('utf-8'))
 			conn.close()	
-		elif (len(url) == 2 and url[1][5:8] == bytes("PTR",'utf-8')):	#type "PTR"
+		elif (len(url) == 2 and req_type == 'PTR'):	#type "PTR"
 			
 			if (ValidIp(url[0][5:].decode('utf-8')) == False):
-				url = urlparse(url[0][5:].decode('utf-8'))
-				url = url[2]
-				if (url == ''):
-					conn.send(error_str.encode('utf-8'))
-					conn.close()
-					continue
-			else:
-				url = url[0][5:].decode('utf-8')
-
-			if (url == ''):
+				print("Hostname entered, but IP was expected")
 				conn.send(error_str.encode('utf-8'))
 				conn.close()
 				continue
@@ -169,34 +198,37 @@ while (True):
 			conn.close()
 			continue
 
+		err_check = 0;
+		colon_ind = 0
+		req_type = ''
+
+			
 		for x in range(7,len(data)):	#from index 7 to the rest are URLs/IPs
-			if (data[x][-2] == 'A' or data[x][-1] == 'A'):
-				ind = 0			#ind is var for protecting different EOF endings  
-				if (data[x][-1] == 'A'):
-					ind = 1
-				url = ValidAddress(data[x][:(-3+ind)])
+			colon_ind, req_type = AorPTR(data[x], True)
+
+			if (req_type == 'A'):
+				url = ValidURL(data[x][:colon_ind])
 				if (url == False):
-					conn.send(error_str.encode('utf-8'))
-					conn.close()
+					err_check = len(data)
+					print("IP entered, but hostname was expected")
 					break
 				try:
 					ip = socket.gethostbyaddr(url)
 				except:
+					err_check += 1
 					continue	#not included to final response
 				send_str = url + ":A=" + ip[2][0] + "\n"
 
-			elif (data[x][-4:-1] == 'PTR' or data[x][-3:] == 'PTR'):
-				ind = 0			
-				if (data[x][-3:] == 'PTR'):
-					ind = 1
-				url = ValidAddress(data[x][:(-5+ind)])
+			elif (req_type == 'PTR'):
+				url = ValidIp(data[x][:colon_ind])
 				if (url == False):
-					conn.send(error_str.encode('utf-8'))
-					conn.close()
+					err_check = len(data)
+					print("Hostname entered, but IP was expected")
 					break
 				try:
 					host = socket.gethostbyaddr(url)
 				except:
+					err_check += 1
 					continue	#not included to final response
 				send_str = url + ":PTR=" + host[0] + "\n"				
 			else:
@@ -204,11 +236,20 @@ while (True):
 				conn.close()
 				break
 			final_msg += send_str
-		
-		http_ver = http + " 200 OK\r\n\r\n"
-		conn.send(http_ver.encode('utf-8'))
-		conn.send(final_msg.encode('utf-8'))
-		conn.close()
+
+		if (err_check == len(data)-7 or err_check == len(data)):
+			if (err_check == len(data)):
+				conn.send(error_str.encode('utf-8'))
+				conn.close()
+			else:
+				error_str = http + ' 404 Not Found\r\n\r\n'
+				conn.send(error_str.encode('utf-8'))
+				conn.close()
+		else:
+			http_ver = http + " 200 OK\r\n\r\n"
+			conn.send(http_ver.encode('utf-8'))
+			conn.send(final_msg.encode('utf-8'))
+			conn.close()
 	# neither of allowed requests
 	else:
 		error_str = http + ' 405 Method Not Allowed\r\n\r\n'
