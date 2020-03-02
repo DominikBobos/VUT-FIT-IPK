@@ -6,6 +6,7 @@ Projekt implementovaný v jazyku **_Python3_**.
 Použité knižnice sú:<br/>
 _socket_ na vytvorenie serveru, komunikáciu s klientom a overovanie IP adries _(IPv4, IPv6)_ <br/>
 _sys_ pre správu triviálnych funkcií ako sys.exit alebo spracovanie argumentu<br/>
+_signal_ pre zachytávanie signáu SIGINT _(keyboard interruptions)_ <br/>
 _urllib_ konkrétne urlparse - na validáciu url adries.<br/>
 <br/>
 Server po spustení na localhost a zadanom porte beží v nekonečnom cykle pričom čaká na pripojenie klienta, po pripojení vypíše na stdout bližšie informácie o klientovi a začne spĺňať požiadavky klienta, v prípade chýb v požiadavku alebo iných nepriaznivých situacií server posiela klientovi návratový kód  _400 Bad Request, 404 Not Found, 405 Method Not Allowed_ a v prípade úspechu pošle žiadanú odpoveď s návratovou hodnotou _200 OK_.<br/>

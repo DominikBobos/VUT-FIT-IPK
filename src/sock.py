@@ -157,7 +157,8 @@ while (True):
 			conn.send(send_str.encode('utf-8'))
 			conn.close()	
 		elif (len(url) == 2 and req_type == 'PTR'):	#type "PTR"
-			if (ValidIp(url[0][5:].decode('utf-8')) == False):
+			url = ValidIp(url[0][5:])
+			if (url == False):
 				print("Hostname entered, but IP was expected")
 				conn.send(error_str.encode('utf-8'))	#400 Bad Request
 				conn.close()
