@@ -11,8 +11,8 @@ from urllib.parse import urlparse	#for validating url
 
 #for keyboard interrupt
 def SignalHandler(sig, frame):
-    print('Server on PORT =', TCP_PORT, 'ended its session!')
-    sys.exit(0)
+	print('Server on PORT =', TCP_PORT, 'ended its session!')
+	sys.exit(0)
 
 def ValidIp(address):	#checks for valid IP
 	if (isinstance(address, bytes)):
@@ -68,6 +68,8 @@ def AorPTR(data, bool_str):
 			return data.rfind(':'), "PTR"
 		else:
 			return False, False
+	elif (data == ''):
+		return 0, ''
 	else:
 		return False, False
 
@@ -233,7 +235,10 @@ while (True):
 				except:
 					err_check += 1
 					continue	#not included to final response
-				send_str = url + ":PTR=" + host[0] + "\n"				
+				send_str = url + ":PTR=" + host[0] + "\n"			
+			elif (colon_ind == 0 and req_type == ''):
+				err_check +=1
+				continue	
 			else:
 				err_check = len(data)	#just to specify error message
 				break
