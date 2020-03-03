@@ -201,10 +201,11 @@ while (True):
 		send_str = ''
 		final_msg = ''
 		if(data[7] == ''):				#empty post
-			conn.send(error_str.encode('utf-8'))
+			http_ver = http + " 200 OK\r\n\r\n"
+			conn.send(http_ver.encode('utf-8'))
 			conn.close()
 			continue
-		err_req = 0
+
 		err_check = 0;
 		colon_ind = 0
 		req_type = ''
@@ -215,7 +216,7 @@ while (True):
 			if (req_type == 'A'):
 				url = ValidURL(data[x][:colon_ind])
 				if (url == False):
-					err_req += 1	#just to specify error message
+					err_check += 1	#just to specify error message
 					print("IP entered, but hostname was expected")
 					continue
 				try:
@@ -228,7 +229,7 @@ while (True):
 			elif (req_type == 'PTR'):
 				url = ValidIp(data[x][:colon_ind])
 				if (url == False):
-					err_req += 1	#just to specify error message
+					err_check += 1	#just to specify error message
 					print("Hostname entered, but IP was expected")
 					continue
 				try:
@@ -238,21 +239,17 @@ while (True):
 					continue	#not included to final response
 				send_str = url + ":PTR=" + host[0] + "\n"			
 			elif (colon_ind == 0 and req_type == ''):
-				err_req +=1
+				err_check +=1
 				continue	
 			else:
-				err_req += 1	#just to specify error message
-				break
+				err_check += 1	#just to specify error message
+				continue
 			final_msg += send_str
 
-		if (err_check == len(data)-7 or (err_req + err_check == len(data)-7)):
-			if (err_req == len(data)-7):		#bad request
-				conn.send(error_str.encode('utf-8'))
-				conn.close()
-			else:
-				error_str = http + ' 404 Not Found\r\n\r\n'
-				conn.send(error_str.encode('utf-8'))
-				conn.close()
+		if (err_check == len(data)-7):
+			error_str = http + ' 404 Not Found\r\n\r\n'
+			conn.send(error_str.encode('utf-8'))
+			conn.close()
 		else:
 			http_ver = http + " 200 OK\r\n\r\n"
 			conn.send(http_ver.encode('utf-8'))
