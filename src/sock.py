@@ -2,6 +2,7 @@ import socket 	  		            #for all the server work
 import sys							#for input arguments
 import signal				 	    #for keyboard interrupt handling
 from urllib.parse import urlparse	#for validating url
+import re
 
 ##
 #	Projekt pre predmet IPK
@@ -62,9 +63,9 @@ def AorPTR(data, bool_str):
 		else:
 			return False, False
 	elif (data.rfind(':') != -1):	#I have POST request
-		if (data.find('A',data.rfind(':')) != -1):	#it could contain spaces
+		if (re.search(r'[:\s]A$|[\s*](A\s)$',data)):	#it could contain spaces	
 			return data.rfind(':'), "A"
-		elif (data.find('PTR',data.rfind(':')) != -1): #it could contain spaces
+		elif (re.search(r'[:\s]PTR$|[\s*](PTR\s)$',data)): #it could contain spaces
 			return data.rfind(':'), "PTR"
 		else:
 			return False, False
