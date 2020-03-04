@@ -63,9 +63,9 @@ def AorPTR(data, bool_str):
 		else:
 			return False, False
 	elif (data.rfind(':') != -1):	#I have POST request
-		if (re.search(r'[:\s]A$|[\s*](A\s)$',data)):	#it could contain spaces	
+		if (re.search(r'[:\s]A$|[:\s*](A\s)$',data)):	#it could contain spaces	
 			return data.rfind(':'), "A"
-		elif (re.search(r'[:\s]PTR$|[\s*](PTR\s)$',data)): #it could contain spaces
+		elif (re.search(r'[:\s]PTR$|[:\s*](PTR\s)$',data)): #it could contain spaces
 			return data.rfind(':'), "PTR"
 		else:
 			return False, False
@@ -213,7 +213,6 @@ while (True):
 		
 		for x in range(7,len(data)):	#from index 7 to the rest are URLs/IPs
 			colon_ind, req_type = AorPTR(data[x], True)
-
 			if (req_type == 'A'):
 				url = ValidURL(data[x][:colon_ind])
 				if (url == False):
