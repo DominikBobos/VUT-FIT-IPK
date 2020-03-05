@@ -201,7 +201,8 @@ while (True):
 
 		send_str = ''
 		final_msg = ''
-		if(data[7] == ''):				#empty post
+		print(len(data))
+		if((data[7] == '' and len(data) == 8) or (data[7] == '' and data[8] == '' and len(data) == 9)):				#empty post
 			http_ver = http + " 200 OK\r\n\r\n"
 			conn.send(http_ver.encode('utf-8'))
 			conn.close()
