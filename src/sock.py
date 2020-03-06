@@ -155,7 +155,7 @@ while (True):
 			http_ver = http + " 200 OK\r\n\r\n"
 			send_str = url + ":A=" + ip[2][0] + "\n"	
 			conn.send(http_ver.encode('utf-8'))
-			conn.send(send_str.encode('utf-8'))
+			conn.sendall(send_str.encode('utf-8'))
 			conn.close()	
 		elif (len(url) == 2 and req_type == 'PTR'):	#type "PTR"
 			url = ValidIp(url[0][5:])
@@ -174,7 +174,7 @@ while (True):
 			http_ver = http + " 200 OK\r\n\r\n"
 			host = url + ":PTR=" + host[0] + "\n"
 			conn.send(http_ver.encode('utf-8'))
-			conn.send(host.encode('utf-8'))
+			conn.sendall(host.encode('utf-8'))
 			conn.close()
 		elif (len(url) == 2):
 			conn.send(error_str.encode('utf-8'))
@@ -254,7 +254,7 @@ while (True):
 		else:
 			http_ver = http + " 200 OK\r\n\r\n"
 			conn.send(http_ver.encode('utf-8'))
-			conn.send(final_msg.encode('utf-8'))
+			conn.sendall(final_msg.encode('utf-8'))
 			conn.close()
 	# neither of allowed requests
 	else:
