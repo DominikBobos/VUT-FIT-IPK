@@ -1,3 +1,5 @@
+17/20b
+
 # **IPK PROJEKT 1**
 
 ## HTTP resolver doménových mien
